@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -44,20 +43,6 @@ func (store *Store) Mark(id string) {
 	})
 }
 
-func deriveID(href string) string {
-	u := href
-	if strings.HasPrefix(u, "/") {
-		u = os.Getenv("START_URL") + u
-	}
-
-	re := regexp.MustCompile(`/(\d+)(/|$)`)
-	if m := re.FindStringSubmatch(u); len(m) > 1 {
-		return m[1]
-	}
-
-	return u
-}
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -86,7 +71,7 @@ func main() {
 		if strings.Contains(href, os.Getenv("SEARCH_TERM_1")) ||
 			strings.Contains(href, os.Getenv("SEARCH_TERM_2")) &&
 				!strings.Contains(href, os.Getenv("EXCLUDE_TERM_1")) {
-			id := deriveID(href)
+			id := href
 
 			if store.IsNew(id) {
 				fmt.Printf("NEW LISTING: %s (ID: %s)\n", href, id)
